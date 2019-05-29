@@ -56,8 +56,7 @@ class Car:
         return f"Car brand: {self.brand},\ntank capacity {self.tank_capacity},\ntanked fuel: {self.tanked_fuel}"
 
     def __repr__(self):
-        return f"<Car at {hex(id(self))} of brand {self.brand}, with tank full in {roundup(self.percent_filled,
-                                                                                           digits=1)}%>"
+        return f"<Car at {hex(id(self))} of brand {self.brand}, with tank full in {roundup(self.percent_filled, digits=1)}%>"
 
     def fill_tank(self, limit=None, litres=None):
         """
@@ -101,30 +100,27 @@ class Car:
                         raise ValueError("Parameters must be > 0")
                     if limit and litres:
                         raise Exception("Limit and litres not allowed together")
+                    if limit > 1:
+                        raise Exception("Limit must be a float in range (0,1)")
+                    if litres and not correct_fuel_amount(self.tank_capacity, litres, self.tanked_fuel):
+                        raise ValueError("Not sufficient tank capacity")
+                except (Exception, ValueError) as e:
+                    return e
+                else:
                     if not limit and not litres:  # brak argumentów - bak na ful
                         fuel_added = self.tank_capacity - self.tanked_fuel
                         self.tanked_fuel += fuel_added
-                        return fuel_added
-                    if limit <= 1:
+                    # if limit <= 1:
+                    if limit:
                         fuel_added = self.tank_capacity * limit - self.tanked_fuel
                         if fuel_added > 0:
                             self.tanked_fuel += fuel_added
-                        if limit == 0:
-                            fuel_added = 0
-                    else:
-                        raise Exception("Limit must be a float in range (0,1)")
-                    if litres:
-                        if correct_fuel_amount(self.tank_capacity, litres, self.tanked_fuel):
-                            fuel_added = litres
-                            self.tanked_fuel += fuel_added
                         else:
-                            raise Exception("Not sufficient tank capacity")
-                    else:
-                        if not limit and litres == 0:
                             fuel_added = 0
+                    if litres:
+                        fuel_added = litres
+                        self.tanked_fuel += fuel_added
                     return fuel_added
-                except (Exception, ValueError) as e:
-                    print(e)
             else:
                 raise Exception("Limit and litres must be float")
         else:
@@ -171,3 +167,26 @@ class DieselCar(Car):
 
 class EnvironmentalError(Exception):
     pass
+
+
+car = Car(brand='brand_name', tank_capacity=100, tanked_fuel=30)
+print(car.fill_tank(limit = 0.1))
+
+# <- zwraca -20, powinno zwrócić 0, gdyż żadne paliwo nie powinno byćdotankowane.
+
+car = Car(brand='brand_name', tank_capacity=100, tanked_fuel=30)
+print(car.fill_tank(litres = 80.0))
+
+# <- powinno nastąpić rzucenie wyjątku, zwracane jest None
+
+car = Car(brand='brand_name', tank_capacity=100, tanked_fuel=30)
+print(car.fill_tank(litres = 10.0, limit = 0.5))
+
+# <- zwraca None, powinno nastąpić wyrzucenie wyjątku
+
+car = Car(brand='brand_name')
+print(car.fill_tank(litres = 10.0, limit = 0.5))
+
+car = Car(brand='brand_name', tank_capacity=100, tanked_fuel=30)
+print(car.fill_tank(litres = 20.0))
+

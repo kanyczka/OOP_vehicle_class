@@ -169,24 +169,4 @@ class EnvironmentalError(Exception):
     pass
 
 
-car = Car(brand='brand_name', tank_capacity=100, tanked_fuel=30)
-print(car.fill_tank(limit = 0.1))
-
-# <- zwraca -20, powinno zwrócić 0, gdyż żadne paliwo nie powinno byćdotankowane.
-
-car = Car(brand='brand_name', tank_capacity=100, tanked_fuel=30)
-print(car.fill_tank(litres = 80.0))
-
-# <- powinno nastąpić rzucenie wyjątku, zwracane jest None
-
-car = Car(brand='brand_name', tank_capacity=100, tanked_fuel=30)
-print(car.fill_tank(litres = 10.0, limit = 0.5))
-
-# <- zwraca None, powinno nastąpić wyrzucenie wyjątku
-
-car = Car(brand='brand_name')
-print(car.fill_tank(litres = 10.0, limit = 0.5))
-
-car = Car(brand='brand_name', tank_capacity=100, tanked_fuel=30)
-print(car.fill_tank(litres = 20.0))
 
